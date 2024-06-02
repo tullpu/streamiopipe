@@ -18,7 +18,7 @@ def stringiopipe(func):
     return wrapper
 
 class StreamIOPipe(object):
-    def __init__(self,filein,fileout,text=True):
+    def __init__(self,filein=None,fileout=None,text=True):
         self.fileout = fileout
         self.text = text 
         self.data = self.from_stream(filein)
@@ -30,8 +30,8 @@ class StreamIOPipe(object):
             self.r = 'rb'
             self.w = 'wb'
 
-    def from_stream(self,filename):
-        if type(filename) == str:
+    def from_stream(self,filename=None):
+        if filename:
             with open(filename,self.r) as fp:
                 if self.text:
                     return io.StringIO(fp.read())
@@ -41,10 +41,10 @@ class StreamIOPipe(object):
             if self.text:
                 return io.StringIO(sys.stdin.read())
             else:
-                return io.BytesIO(sys.stdin.read())
+                return io.BytesIO(sys.stdin.buffer.read())
 
-    def to_stream(self,filename,streamin):
-        if type(filename) == str:
+    def to_stream(self,streamin,filename=None):
+        if filename:
             with open(filename,self.w) as fp:
                 fp.write(streamin.getvalue())
         else:
@@ -66,5 +66,5 @@ class StreamIOPipe(object):
             self.run(cmd,**args)
 
     def __exit__(self, exc_type, exc_val, traceback):
-        self.to_stream(self.fileout,self.data)
+        self.to_stream(self.data,self.fileout)
 

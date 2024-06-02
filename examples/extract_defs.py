@@ -8,5 +8,5 @@ def definitions(outstream,instream):
         if line.strip().startswith('def'):
             outstream.write(f"{line.strip().split('(')[0][4:]}\n")
 
-with StreamIOPipe(sys.stdin,sys.stdout) as sp:
+with StreamIOPipe() as sp:
     sp.run(definitions)
