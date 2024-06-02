@@ -66,7 +66,7 @@ class StreamIOPipe(object):
         self.data = self.from_stream(filein)
 
 
-        # [describe if]
+        # set file flags for text or binary
         if text:
             self.r = 'rt'
             self.w = 'wt'
@@ -83,25 +83,23 @@ class StreamIOPipe(object):
         """
         
 
-        # [describe if]
+        # check if file or stdin
         if filename:
             with open(filename, self.r) as fp:
 
-                # [describe if]
                 if self.text:
                     return io.StringIO(fp.read())
                 else:
                     return io.BytesIO(fp.read())
         else:
 
-            # [describe if]
             if self.text:
                 return io.StringIO(sys.stdin.read())
             else:
                 return io.BytesIO(sys.stdin.buffer.read())
 
     def to_stream(self, streamin, filename=None):
-        """ [Summary]
+        """ Write data to file
         
         :param streamin: the stream to save
         :type  streamin: StringOI/BytesIO
@@ -144,7 +142,7 @@ class StreamIOPipe(object):
         self.data = func(self.data, **kwargs)
 
     def iterate(self, funcs):
-        """ [Summary]
+        """ execute the functions sequentially
         
         :param funcs: list of functions to be run sequentially
         :type  funcs: list
