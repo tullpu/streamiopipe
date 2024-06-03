@@ -85,12 +85,18 @@ class StreamIOPipe(object):
 
         # check if file or stdin
         if filename:
-            with open(filename, self.r) as fp:
+            # if string it is a filename
+            if type(filename) == str:
+                with open(filename, self.r) as fp:
 
-                if self.text:
-                    return io.StringIO(fp.read())
-                else:
-                    return io.BytesIO(fp.read())
+                    if self.text:
+                        return io.StringIO(fp.read())
+                    else:
+                        return io.BytesIO(fp.read())
+            elif isinstance(filename,io.StringIO) or isinstance(filename,io.BytesIO):
+                return filename
+            else:
+                raise TypeError("Unepected Object passed as file/stream")
         else:
 
             if self.text:
@@ -110,17 +116,21 @@ class StreamIOPipe(object):
         """
         
 
+        output = streamin.getvalue()
+        if self.text and isinstance(output,bytes):
+            output = output.encode('utf-8')
+
         # if it is a filename then write to file
         if filename:
-            with open(filename, self.w) as fp:
-                fp.write(streamin.getvalue())
+            if type(filename) == str:
+                with open(filename, self.w) as fp:
+                    fp.write(output)
+            elif isinstance(filename,io.StringIO) or isinstance(filename,io.BytesIO):
+                    filename.write(output)
+            else:
+                raise TypeError("Unepected Object passed as file/stream")
         else: # else write to stdin
-
-            # write as text
-            if self.text:
-                sys.stdout.buffer.write(streamin.getvalue().encode('utf-8'))
-            else: # write as binary
-                sys.stdout.buffer.write(streamin.getvalue())
+            sys.stdout.buffer.write(output)
 
     def __enter__(self):
         """ Context manager. Automatically opens input 
