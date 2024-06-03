@@ -115,7 +115,6 @@ class StreamIOPipe(object):
         
         """
         
-
         output = streamin.getvalue()
         if self.text and isinstance(output,bytes):
             output = output.encode('utf-8')
@@ -126,11 +125,14 @@ class StreamIOPipe(object):
                 with open(filename, self.w) as fp:
                     fp.write(output)
             elif isinstance(filename,io.StringIO) or isinstance(filename,io.BytesIO):
-                    filename.write(output)
+                filename.write(output)
             else:
                 raise TypeError("Unepected Object passed as file/stream")
         else: # else write to stdin
-            sys.stdout.buffer.write(output)
+            if self.text:
+                sys.stdout.write(output)
+            else:
+                sys.stdout.buffer.write(output)
 
     def __enter__(self):
         """ Context manager. Automatically opens input 
@@ -151,6 +153,7 @@ class StreamIOPipe(object):
         
         self.data = func(self.data, **kwargs)
 
+
     def iterate(self, funcs):
         """ execute the functions sequentially
         
@@ -164,6 +167,8 @@ class StreamIOPipe(object):
         for p in funcs:
             data = (*p,{})
             self.run(data[0],**data[1])
+        
+
 
     def __exit__(self, exc_type, exc_val, traceback):
         """ Context manager, write and close the file
