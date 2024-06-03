@@ -152,8 +152,8 @@ class StreamIOPipe(object):
 
         # iterate and execute functions
         for p in funcs:
-            (cmd, args) = (*p, {})
-            self.run(cmd, **args)
+            data = (*p,{})
+            self.run(data[0],**data[1])
 
     def __exit__(self, exc_type, exc_val, traceback):
         """ Context manager, write and close the file
