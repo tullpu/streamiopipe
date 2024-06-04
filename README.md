@@ -6,7 +6,36 @@ A library that allows to process streams using simple user defined functions in 
 # Installation
 
 ```bash
-pip install streamoipipe
+pip install streamiopipe
+```
+
+# How to use
+
+1. Select whether the stream you are going to use is text or binary by using the appropriate decorator *stringiopipe* or *byteiopipe*
+2. Write a function that accepts an input and and output stream and some optional arguments
+3. Process each input line/byte and write to the output stream.
+4. Use the StreamIOPipe context manager to call the function/functions on the stream.
+    -   You can use the optional filein=None, fileout=None arguments to describe the stremas
+        -   None means stdin / stdout
+        -   string means a filename
+        -   StringIO BytesIO a stream you created
+    -   text=True whether it text or binary stream
+5. Use run if you are planning to use one function or iterate if you want to use a list of functions in a sequence
+
+
+So the unix grep would look like:
+```python
+
+@stringiopipe
+def unix_grep(outstream,instream,substring=""):
+    for line in instream:
+        if substring in line:
+            outstream.write(line)
+
+# use stdin/stdout
+with StreamIOPipe(text=True) as sp:
+    sp.run(unix_grep,{'substring':'foo'})
+
 ```
 
 
